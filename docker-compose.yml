@@ -1,0 +1,15 @@
+version: '3.1'
+
+services:
+
+  habilitados_db:
+    image: mongo
+    container_name: habilitados_db
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${ROOT_PASS}
+    volumes:
+      - './data:/data/db'
