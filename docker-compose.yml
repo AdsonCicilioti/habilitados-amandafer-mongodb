@@ -1,15 +1,87 @@
-version: '3.1'
+version: "3.8"
 
 services:
+  # habilitados_db:
+  #   image: mongo
+  #   container_name: habilitados_db
+  #   restart: always
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: ${CPU_LIMIT}
+  #         memory: ${MEM_LIMIT}
+  #       reservations:
+  #         cpus: ${CPU_RESERV}
+  #         memory: ${MEM_RESERV}
+  #   ports:
+  #     - 27017:27017
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: ${ROOT_USER}
+  #     MONGO_INITDB_ROOT_PASSWORD: ${ROOT_PASS}
+  #   volumes:
+  #     - "./data:/data/db"
 
-  habilitados_db:
+  # first, we define the three mongo servers that will act as replicas
+  # here, we steup the hostname ports, and startup command
+  # which is the same as discussed in the previous section
+  habilitados_db_1:
+    hostname: habafdb1
+    container_name: habilitados_db_1
     image: mongo
-    container_name: habilitados_db
-    restart: always
+    networks:
+      - mongo-rset-net
     ports:
-      - 27017:27017
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${ROOT_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${ROOT_PASS}
+      - 30001:27017
+    restart: always
+    links:
+      - habilitados_db_2
+      - habilitados_db_3
     volumes:
-      - './data:/data/db'
+      - "./data1:/data/db"
+      - "./rs-init.sh:/scripts/rs-init.sh"
+    entrypoint:
+      [
+        "/usr/bin/mongod",
+        "--bind_ip_all",
+        "--replSet",
+        "habaf-mongo-set"
+      ]
+  habilitados_db_2:
+    hostname: habafdb2
+    container_name: habilitados_db_2
+    image: mongo
+    networks:
+      - mongo-rset-net
+    ports:
+      - 30002:27017
+    restart: always
+    volumes:
+      - "./data2:/data/db"
+    entrypoint:
+      [
+        "/usr/bin/mongod",
+        "--bind_ip_all",
+        "--replSet",
+        "habaf-mongo-set"
+      ]
+  habilitados_db_3:
+    hostname: habafdb3
+    container_name: habilitados_db_3
+    image: mongo
+    networks:
+      - mongo-rset-net
+    ports:
+      - 30003:27017
+    restart: always
+    volumes:
+      - "./data3:/data/db"
+    entrypoint:
+      [
+        "/usr/bin/mongod",
+        "--bind_ip_all",
+        "--replSet",
+        "habaf-mongo-set"
+      ]
+networks:
+  mongo-rset-net:
+    driver: bridge
