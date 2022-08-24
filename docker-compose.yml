@@ -22,20 +22,20 @@ services:
   #     - "./data:/data/db"
 
   # first, we define the three mongo servers that will act as replicas
-  # here, we steup the hostname ports, and startup command
   # which is the same as discussed in the previous section
-  habilitados_db_1:
-    hostname: habafdb1
-    container_name: habilitados_db_1
+  habafdb1:
+    container_name: habafdb1
     image: mongo
     networks:
       - mongo-rset-net
+    expose:
+      - 27017
     ports:
-      - 30001:27017
+      - 27017:27017
     restart: always
     links:
-      - habilitados_db_2
-      - habilitados_db_3
+      - habafdb2
+      - habafdb3
     volumes:
       - "./data1:/data/db"
       - "./rs-init.sh:/scripts/rs-init.sh"
@@ -46,14 +46,15 @@ services:
         "--replSet",
         "habaf-mongo-set"
       ]
-  habilitados_db_2:
-    hostname: habafdb2
-    container_name: habilitados_db_2
+  habafdb2:
+    container_name: habafdb2
     image: mongo
     networks:
       - mongo-rset-net
+    expose:
+      - 27018
     ports:
-      - 30002:27017
+      - 27018:27017
     restart: always
     volumes:
       - "./data2:/data/db"
@@ -64,14 +65,15 @@ services:
         "--replSet",
         "habaf-mongo-set"
       ]
-  habilitados_db_3:
-    hostname: habafdb3
-    container_name: habilitados_db_3
+  habafdb3:
+    container_name: habafdb3
     image: mongo
     networks:
       - mongo-rset-net
+    expose:
+      - 27019
     ports:
-      - 30003:27017
+      - 27019:27017
     restart: always
     volumes:
       - "./data3:/data/db"
