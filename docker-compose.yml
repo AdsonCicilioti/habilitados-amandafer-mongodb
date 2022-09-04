@@ -33,9 +33,6 @@ services:
     ports:
       - 27017:27017
     restart: always
-    links:
-      - habafdb2
-      - habafdb3
     volumes:
       - "./data1:/data/db"
       - "./rs-init.sh:/scripts/rs-init.sh"
